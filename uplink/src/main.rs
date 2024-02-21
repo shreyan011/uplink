@@ -222,6 +222,7 @@ impl CommandLine {
         "#;
 
         println!("{B}");
+        println!("Raptee test");
         println!("    version: {}", self.version);
         println!("    profile: {}", self.profile);
         println!("    commit_sha: {}", self.commit_sha);
@@ -281,7 +282,8 @@ fn main() -> Result<(), Error> {
     let config = commandline.get_configs()?;
     commandline.banner(&config);
 
-    let config = Arc::new(config);
+    println!("{:#?}", config);
+    let config = Arc::new(config);+
     let mut uplink = Uplink::new(config.clone())?;
     let mut bridge = uplink.configure_bridge();
     uplink.spawn_builtins(&mut bridge)?;
