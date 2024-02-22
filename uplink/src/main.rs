@@ -277,19 +277,23 @@ fn main() -> Result<(), Error> {
         return Ok(());
     }
 
-    let commandline: CommandLine = StructOpt::from_args();
-    let reload_handle = commandline.initialize_logging();
-    let config = commandline.get_configs()?;
-    commandline.banner(&config);
+    let commandline: CommandLine = StructOpt::from_args(); //Parses the command line arguments into a CommandLine struct using the StructOpt crate
+    let reload_handle = commandline.initialize_logging(); //Initializes logging and returns a handle to reload logs.
+    let config = commandline.get_configs()?;//Gets the configuration from the command line.
+    commandline.banner(&config);//the whole uplink banner
 
-    println!("{:#?}", config);
-    let config = Arc::new(config);+
-    let mut uplink = Uplink::new(config.clone())?;
-    let mut bridge = uplink.configure_bridge();
-    uplink.spawn_builtins(&mut bridge)?;
+    println!("{:#?}", config);//prints the config details
+    let config = Arc::new(config);//Wraps the config in an Arc smart pointer to allow sharing across threads,I have no idea why
+    let mut uplink = Uplink::new(config.clone())?;//Creates a new Uplink instance with the config.
+    let mut bridge = uplink.configure_bridge();//Configures the bridge for uplink.
+    uplink.spawn_builtins(&mut bridge)?;//Spawns any builtin apps needed by uplink.
 
-    let bridge_tx = bridge.bridge_tx();
+    let bridge_tx = bridge.bridge_tx();//Gets a sender to send messages over the bridge.
 
+
+
+
+    
     let mut tcpapps = vec![];
     for (app, cfg) in config.tcpapps.clone() {
         let route_rx = if !cfg.actions.is_empty() {
@@ -299,7 +303,8 @@ fn main() -> Result<(), Error> {
             None
         };
         tcpapps.push(TcpJson::new(app, cfg, route_rx, bridge.bridge_tx()));
-    }
+        pr
+    }//Iterates through TCP app configs, configures each app, and collects them into a vector.
 
     let simulator_actions = match &config.simulator {
         Some(cfg) if !cfg.actions.is_empty() => {
@@ -309,7 +314,7 @@ fn main() -> Result<(), Error> {
         _ => None,
     };
 
-    let ctrl_tx = uplink.spawn(bridge)?;
+    let ctrl_tx = uplink.spawn(bridge)?;//Spawns the main uplink runtime.
 
     if let Some(config) = config.simulator.clone() {
         spawn_named_thread("Simulator", || {

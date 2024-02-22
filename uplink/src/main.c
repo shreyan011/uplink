@@ -63,7 +63,12 @@ int uplink_client_init_s32(void)
     }
     else
     {
-        printf("connected to the server..\n");
+        printf("connected to the server\n");
+        printf("Connected to server at IP: %s, Port: %d\n",
+        inet_ntoa(cli.sin_addr), ntohs(cli.sin_port));
+
+        //return  0;
+        //printf("%d\n",servaddr);
         return 0;
     }
 }
@@ -86,7 +91,7 @@ uint8_t json_pack_device_shadow_message()
              seq_id, "hello_world");
     //printf("The packed JSON is : %s\n", json_can_message_buff_gau8);
     printf("The packed JSON is : %s\n",  json_device_shadow_message_buff_gau8);
-    return 0;
+    //return 0;
 }
 
 void uplink_push_vp()
@@ -97,8 +102,10 @@ void uplink_push_vp()
 
    // while (1)
     //{
-
+        
         json_pack_device_shadow_message();
+        
+        printf("sample");
         int ret = 0;
         //ret = write(sockfd, json_pack_device_shadow_message, strlen(json_pack_device_shadow_message));
         ret = write(sockfd, json_device_shadow_message_buff_gau8, strlen(json_device_shadow_message_buff_gau8));
